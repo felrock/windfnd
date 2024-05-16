@@ -19,7 +19,6 @@
 
 using namespace ftxui;
 
-
 int get_day(const std::string& date_str, std::string& day)
 {
     std::tm tm = {};
@@ -87,7 +86,7 @@ int parse_location(const std::string& location_arg, float& lat, float& lon)
     return 0;
 }
 
- int get_weather_data(float& lat, float &lon, int days, nlohmann::json& weather_data)
+int get_weather_data(float& lat, float &lon, int days, nlohmann::json& weather_data)
 {
     httplib::Client cli("https://api.open-meteo.com");
     std::string query = "/v1/forecast?latitude=" + std::to_string(lat) + "&longitude=" + std::to_string(lon)
@@ -197,14 +196,6 @@ int main(int argc, char** argv)
     const std::vector<Forecast> forecast_objects = parse_weather_data(weather_data);
 
     std::vector<Element> forecasts;
-    if (!location_arg.empty())
-    {
-        forecasts.push_back(window(text("Location"), vbox(text(location_arg))));
-    }
-    else
-    {
-        forecasts.push_back(window(text("Location"), vbox(text("lat: " + std::to_string(lat) + ", lon: " + std::to_string(lon)))));
-    }
 
     for (const auto& forecast_obj : forecast_objects)
     {
@@ -232,21 +223,37 @@ int main(int argc, char** argv)
         forecasts.push_back(window(text(day_name), day_box));
     }
 
-    auto grid = window(text("--Windfnd--"), vbox(forecasts));
+    if (!location_arg.empty())
+    {
+        forecasts.push_back(window(text("Location"), vbox(text(location_arg))));
+    }
+    else
+    {
+        forecasts.push_back(window(text("Location"), vbox(text("lat: " + std::to_string(lat) + ", lon: " + std::to_string(lon)))));
+    }
+
+    // Add location input element
+    std::string location_input;
+    auto input_component = Input(&location_input, "location");
+
+
+    // Create menu layout
+    auto menu = vbox({
+        text("menu"),
+        hbox({
+            text("Enter location: "),
+            input_component->Render()
+        })
+    });
+    auto content = hbox({
+        vbox(forecasts),
+        menu
+    });
+    auto grid = window(text("--Windfnd--"), vbox(content));
 
     auto screen = ScreenInteractive::TerminalOutput();
     auto renderer = Renderer([&] { return grid; });
-    auto component = CatchEvent(renderer, [&](Event event)
-    {
-        if (event == Event::Character('q'))
-        {
-            screen.ExitLoopClosure()();
-            return true;
-        }
-        return false;
-    });
-
-    screen.Loop(component);
+    screen.Loop(renderer);
 
     return 0;
 }
