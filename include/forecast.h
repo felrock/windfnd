@@ -3,110 +3,60 @@
 
 #include <vector>
 #include <string>
-#include <iomanip>
+#include <array>
+#include <nlohmann/json.hpp>
 
-#include <ftxui/dom/elements.hpp>
+namespace forecast
+{
+
+struct ForecastStep {
+    int hour;
+    float wind;
+    float gust;
+    int direction;
+    float temperature;
+};
+
+enum ForecastLevel {LOW, NORMAL, HIGH};
 
 class Forecast
 {
 public:
-    Forecast(const std::string& date, const std::vector<float>& wind_mean, const std::vector<float>& wind_gust,
-             const std::vector<float>& wind_direction, const std::vector<float>& temperature_air)
-        : date(date), wind_mean(wind_mean), wind_gust(wind_gust), wind_direction(wind_direction),
-          temperature_air(temperature_air)
-    {}
+    Forecast(){};
 
-    std::string getDate() const
-    {
-        return date;
-    }
+    // Copy constructor
+    Forecast(const Forecast& other);
 
-    std::vector<std::string> getWindMean() const
-    {
-        return format_values(wind_mean);
-    }
+    // Move constructor
+    Forecast(Forecast&& other) noexcept;
 
-    std::vector<std::string> getWindGust() const
-    {
-        return format_values(wind_gust);
-    }
+    // Function to get formatted forecast data for a specific day and hour
+    std::vector<std::string> get_forecast_step(int day, int hour) const;
 
-    std::vector<std::string> getWindDirection() const
-    {
-        std::vector<std::string> formatted_values;
-        std::vector<std::string> directions = {"N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
-                                               "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"};
-        for (float value : wind_direction)
-        {
-            int val = static_cast<int>((value / 22.5) + 0.5);
-            formatted_values.push_back(directions[val % 16]);
-        }
-        return formatted_values;
-    }
-
-    std::vector<std::string> getTemperatureAir() const
-    {
-        return format_values(temperature_air);
-    }
-
-    std::vector<ftxui::Color> getWindMeanColorScheme() const
-    {
-        return generate_color_scheme(wind_mean, 1, 7, 7, 12, 25);
-    }
-
-    std::vector<ftxui::Color> getWindGustColorScheme() const
-    {
-        return generate_color_scheme(wind_gust, 1, 10, 10, 14, 25);
-    }
-
-    std::vector<ftxui::Color> getTemperatureAirColorScheme() const
-    {
-        return generate_color_scheme(temperature_air, -20, 5, 5, 25, 45);
-    }
+    // Function to update the forecast data for a specific day and hour
+    void update_forecast_step(int day, int hour, float wind, float gust, int dir, float temp);
 
 private:
-    std::string date;
-    std::vector<float> wind_mean;
-    std::vector<float> wind_gust;
-    std::vector<float> wind_direction;
-    std::vector<float> temperature_air;
+    std::string start_of_forecast_date_;
+    std::array<std::array<ForecastStep, 24>, 7> forecasts_day_;
 
-    std::vector<std::string> format_values(const std::vector<float>& values) const
-    {
-        std::vector<std::string> formatted_values;
-        for (float value : values)
-        {
-            std::ostringstream out;
-            out << std::fixed << std::setprecision(1) << value;
-            formatted_values.push_back(out.str());
-        }
-        return formatted_values;
-    }
+    const std::array<float, 5> wind_levels_{0.0, 7.0, 12.0, 25.0};
+    const std::array<float, 5> gust_levels_{0.0, 9.0, 14.0, 25.0};
+    const std::array<float, 5> temp_levels_{-20.0, 15.0, 25.0, 45.0};
 
-    std::vector<ftxui::Color> generate_color_scheme(const std::vector<float>& values, float low_min, float low_max, float mid_min, float mid_max, float high_max) const
-    {
-        std::vector<ftxui::Color> color_scheme;
-        for (float value : values)
-        {
-            if (value >= low_min && value <= low_max)
-            {
-                color_scheme.push_back(ftxui::Color::Blue);
-            }
-            else if (value > mid_min && value <= mid_max)
-            {
-                color_scheme.push_back(ftxui::Color::Green);
-            }
-            else if (value > mid_max && value <= high_max)
-            {
-                color_scheme.push_back(ftxui::Color::Red);
-            }
-            else
-            {
-                color_scheme.push_back(ftxui::Color::Default); // Default color for out-of-range values
-            }
-        }
-        return color_scheme;
-    }
+    // Function to format a float to a string with precision 1
+    std::string format_float(float value) const;
+
+    // Function to convert direction in degrees to a compass direction string
+    std::string convert_direction(int degrees) const;
 };
+
+// Function to create a Forecast object from a JSON object
+void update_forecast(Forecast& forecast, const nlohmann::json& weather_data);
+
+// Function to create a Forecast object from a JSON object
+Forecast create_forecast(const nlohmann::json& weather_data);
+
+}  // namespace forecast
 
 #endif  // include_forecast_h_
