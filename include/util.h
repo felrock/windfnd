@@ -22,25 +22,26 @@ const std::vector<std::string> hours = {"00", "01", "02", "03", "04", "05", "06"
     "20", "21", "22", "23"
 };
 
-
-
-static int get_day(const std::string& date_str, std::string& day)
+static int get_day(const std::string& date_str, std::string& day, int day_offset=0)
 {
     std::tm tm = {};
     std::istringstream ss(date_str);
-    ss >> std::get_time(&tm, "%Y-%m-%d");
+    ss >> std::get_time(&tm, "%Y-%m-%dT%H:%M");
     if (ss.fail())
     {
-        std::cerr << "Failed to parse date string" << std::endl;
+        std::cerr << "Failed to parse date string " << date_str << std::endl;
         return 1;
     }
 
     std::time_t time = std::mktime(&tm);
     if (time == -1)
     {
-        std::cerr << "Failed to convert to time_t" << std::endl;
+        std::cerr << "Failed to convert to time_t" << date_str << std::endl;
         return 1;
     }
+
+    // Apply day offset
+    time += day_offset * 24 * 60 * 60;
 
     std::tm* time_tm = std::localtime(&time);
     day = util::days_of_week[time_tm->tm_wday];

@@ -17,6 +17,12 @@ namespace render
 
 using RenderMethod = std::function<ftxui::Element()>;
 
+void get_location(const nlohmann::json& location_data, std::string& lat, std::string& lon);
+
+ftxui::Component create_components(std::string& location_input, forecast::Forecast& forecast, api::WeatherAPIClient& api_client);
+
+ftxui::Color get_color_from_forecastlevel(const forecast::ForecastLevel level);
+
 RenderMethod create_render_method(std::vector<forecast::Forecast>& forecasts, ftxui::ScreenInteractive& screen, ftxui::Component component);
 
 void start_ftxui_application(api::WeatherAPIClient& api_client);

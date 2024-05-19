@@ -56,6 +56,12 @@ target_include_directories(ForecastTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/inc
 # Link required libraries for the test
 target_link_libraries(ForecastTests PRIVATE gtest gtest_main nlohmann_json::nlohmann_json httplib::httplib)
 
+# copy over the files needed for tests
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test/test.json
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test/search_location.json
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 # Add tests
 add_test(NAME ForecastTests COMMAND ForecastTests)
 
