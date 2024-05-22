@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "forecast.h"
-#include <nlohmann/json.hpp>
+#include <json.hpp>
 #include <fstream>
 #include <iostream>
 
@@ -28,8 +28,8 @@ TEST_F(ForecastTest, GetForecastStep) {
     Forecast forecast = create_forecast(weather_data);
 
     // Test data for the first hour
-    auto result = forecast.get_forecast_step(0, 0);
-    std::cout << forecast.get_start_date() << std::endl;
+    auto result = forecast.get_forecast_step(6, 23);
+    std::cout <<  result[3] << std::endl;
 }
 
 // Test update_forecast_step method

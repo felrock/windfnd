@@ -67,6 +67,7 @@ ftxui::Color get_color_from_forecastlevel(const forecast::ForecastLevel level)
     }
 }
 
+// TODO(felrock): Add different rendering stages, menu, forecast, load from config...
 RenderMethod create_render_method(Component& component, forecast::Forecast& forecast)
 {
     return [&]() -> ftxui::Element {

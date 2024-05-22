@@ -1,4 +1,3 @@
-
 #include <gtest/gtest.h>
 #include "util.h" // Ensure this includes the declaration of get_day function and days_of_week array
 

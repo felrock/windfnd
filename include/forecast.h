@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <array>
-#include <nlohmann/json.hpp>
+#include <json.hpp>
 
 namespace forecast
 {

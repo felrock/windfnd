@@ -4,7 +4,8 @@ namespace api
 {
 
 WeatherAPIClient::WeatherAPIClient()
-    : location_client("https://nominatim.openstreetmap.org"), weather_client("https://api.open-meteo.com")
+    : location_client("https://nominatim.openstreetmap.org")
+    , weather_client("https://api.open-meteo.com")
 {
 }
 
