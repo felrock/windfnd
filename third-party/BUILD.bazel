@@ -1,0 +1,17 @@
+cc_library(
+    name = "json_hpp",
+    hdrs = ["json.hpp"],
+    includes = ["./"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "httplib",
+    hdrs = ["httplib.h"],
+    includes = ["./"],
+    deps = [
+        "@openssl//:openssl",
+    ],
+    defines = ["CPPHTTPLIB_OPENSSL_SUPPORT"],
+    visibility = ["//visibility:public"],
+)

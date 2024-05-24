@@ -1,4 +1,9 @@
 *.npz
 build
 .cache
-
+MODULE.bazel
+MODULE.bazel.lock
+bazel-bin
+bazel-out
+bazel-swell-finder
+bazel-testlogs

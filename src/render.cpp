@@ -147,7 +147,7 @@ RenderMethod create_render_method(Component& component, forecast::Forecast& fore
 
 void start_ftxui_application(api::WeatherAPIClient& api_client)
 {
-    ScreenInteractive screen = ScreenInteractive::Fullscreen();
+    ScreenInteractive screen{ScreenInteractive::Fullscreen()};
     forecast::Forecast forecast;
     std::string location_input{""};
     std::string error_msg{""};

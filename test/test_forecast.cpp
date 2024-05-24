@@ -11,12 +11,12 @@ class ForecastTest : public ::testing::Test {
 protected:
     void SetUp() override {
         // Load test data from test.json file
-        std::ifstream file("test.json");
+        std::ifstream file("test/aux/test.json");
         if (file.is_open()) {
             file >> weather_data;
             file.close();
         } else {
-            std::cerr << "Failed to open test.json" << std::endl;
+            std::cerr << " Failed to open test.json" << std::endl;
         }
     }
 
@@ -30,6 +30,7 @@ TEST_F(ForecastTest, GetForecastStep) {
     // Test data for the first hour
     auto result = forecast.get_forecast_step(6, 23);
     std::cout <<  result[3] << std::endl;
+    std::cout <<  result[0] << std::endl;
 }
 
 // Test update_forecast_step method

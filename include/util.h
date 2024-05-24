@@ -24,6 +24,10 @@ const std::vector<std::string> hours = {"00", "01", "02", "03", "04", "05", "06"
 
 static int get_day(const std::string& date_str, std::string& day, int day_offset=0)
 {
+    if (date_str.empty())
+    {
+        return 1;
+    }
     std::tm tm = {};
     std::istringstream ss(date_str);
     ss >> std::get_time(&tm, "%Y-%m-%dT%H:%M");

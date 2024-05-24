@@ -1,0 +1,48 @@
+filegroup(
+    name = "test_stuff",
+    srcs = glob(["aux/*.json"]),
+)
+
+cc_test(
+    name = "ForecastTests",
+    srcs = [
+        "test_forecast.cpp",
+    ],
+    includes = ["include"],
+    copts = ["-std=c++17"],
+    deps = [
+        "@googletest//:gtest_main",
+        "//:weather_api",
+        "//:forecast",
+    ],
+    data = [
+        ":test_stuff",
+    ],
+)
+
+cc_test(
+    name = "UtilTests",
+    srcs = ["test_util.cpp"],
+    copts = ["-std=c++17"],
+    deps = [
+        "@googletest//:gtest_main",
+        "//:util",
+    ],
+)
+
+cc_test(
+    name = "WeatherAPITests",
+    srcs = [
+        "test_weather_api.cpp",
+    ],
+    includes = ["include"],
+    copts = ["-std=c++17"],
+    deps = [
+        "@googletest//:gtest_main",
+        "//:weather_api",
+        "//:forecast",
+    ],
+    data = [
+        ":test_stuff",
+    ],
+)

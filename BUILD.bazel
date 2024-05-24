@@ -1,0 +1,60 @@
+cc_library(
+    name = "util",
+    srcs = ["include/util.h"],
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "forecast",
+    srcs = ["src/forecast.cpp"],
+    hdrs = ["include/forecast.h"],
+    includes = ["include"],
+    deps = [
+        "//third-party:json_hpp",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "weather_api",
+    srcs = ["src/weather_api.cpp"],
+    hdrs = ["include/weather_api.h"],
+    includes = ["include"],
+    deps = [
+        "//third-party:httplib",
+        "//third-party:json_hpp"
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "render",
+    srcs = ["src/render.cpp"],
+    hdrs = ["include/render.h"],
+    includes = ["include"],
+    deps = [
+        ":forecast",
+        ":weather_api",
+        ":util",
+        "@ftxui//:ftxui_screen",
+        "@ftxui//:ftxui_dom",
+        "@ftxui//:ftxui_component",
+        "//third-party:json_hpp",
+    ],
+    copts = ["-std=c++17"],
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "windfnd",
+    srcs = [
+        "src/main.cpp",
+    ],
+    includes = ["include", "third-party"],
+    copts = ["-std=c++17"],
+    deps = [
+        ":render",
+    ],
+    visibility = ["//visibility:public"],
+)

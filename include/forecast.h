@@ -4,7 +4,8 @@
 #include <vector>
 #include <string>
 #include <array>
-#include <json.hpp>
+
+#include "json.hpp"
 
 namespace forecast
 {
