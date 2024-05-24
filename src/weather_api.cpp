@@ -20,9 +20,11 @@ nlohmann::json WeatherAPIClient::get_location(const std::string& location_arg)
     std::string query = "/search?q=" + location_arg + "&format=json&limit=1";
     auto res = location_client.Get(query.c_str());
 
-    if (res && res->status == 200) {
+    if (res && res->status == 200)
+    {
         json = nlohmann::json::parse(res->body);
-        if (!json.empty()) {
+        if (!json.empty())
+        {
             json = json[0];
         }
     }

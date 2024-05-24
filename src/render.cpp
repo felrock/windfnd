@@ -14,9 +14,9 @@ void get_location(const nlohmann::json& location_data, std::string& lat, std::st
     lon = location_data["lon"].get<std::string>();
 }
 
-ftxui::Component create_components(std::string& location_input, forecast::Forecast& forecast, api::WeatherAPIClient& api_client)
+ftxui::Component create_components(std::string& location_input, std::string& error_msg, forecast::Forecast& forecast, api::WeatherAPIClient& api_client)
 {
-    auto input_component = Input(&location_input, "Enter location", InputOption::Default());
+    auto input_component = Input(&location_input, "", InputOption::Default());
     // ignore enter keys from the user
     input_component |= CatchEvent([](Event event) {
         if (event == Event::Return) {
@@ -37,9 +37,19 @@ ftxui::Component create_components(std::string& location_input, forecast::Foreca
         auto location_json = api_client.get_location(location_input);
         get_location(location_json, lat, lon);
 
+        if (location_json.empty() || lat.size() == 0)
+        {
+            error_msg = "Failed to find location";
+        }
+
         auto weather_json = api_client.get_weather(lat, lon);
-        if (!weather_json.is_null()) {
-          forecast::update_forecast(forecast, weather_json);
+        if (!weather_json.empty())
+        {
+            forecast::update_forecast(forecast, weather_json);
+        }
+        else
+        {
+            error_msg = "Failed to get the weather forecast";
         }
     }, ButtonOption::Ascii());
 
@@ -68,7 +78,7 @@ ftxui::Color get_color_from_forecastlevel(const forecast::ForecastLevel level)
 }
 
 // TODO(felrock): Add different rendering stages, menu, forecast, load from config...
-RenderMethod create_render_method(Component& component, forecast::Forecast& forecast)
+RenderMethod create_render_method(Component& component, forecast::Forecast& forecast, std::string const& error_msg)
 {
     return [&]() -> ftxui::Element {
         std::vector<Element> forecast_elements;
@@ -120,7 +130,9 @@ RenderMethod create_render_method(Component& component, forecast::Forecast& fore
         auto menu = window(text("Menu"),
             hbox({
                 text("Enter location: "),
-                component->Render()
+                component->Render(),
+                separator(),
+                text(error_msg) | color(Color::Red)
             })
         );
 
@@ -138,9 +150,10 @@ void start_ftxui_application(api::WeatherAPIClient& api_client)
     ScreenInteractive screen = ScreenInteractive::Fullscreen();
     forecast::Forecast forecast;
     std::string location_input{""};
+    std::string error_msg{""};
 
-    auto components = create_components(location_input, forecast, api_client);
-    RenderMethod render_method = create_render_method(components, forecast);
+    auto components = create_components(location_input, error_msg, forecast, api_client);
+    RenderMethod render_method = create_render_method(components, forecast, error_msg);
     auto renderer = Renderer(components, render_method);
     screen.Loop(renderer);
 }
